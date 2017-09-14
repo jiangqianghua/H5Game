@@ -18,7 +18,7 @@ var Square = function()
 
 Square.prototype.canRotate = function(isValid)
 {
-	var d = this.dir + 1 ; 
+	var d = (this.dir + 1)%4 ; 
 	if(d == 4)
 	{
 		d = 0 ; 
@@ -39,9 +39,10 @@ Square.prototype.canRotate = function(isValid)
 	}
 	return isValid(this.origin, test);
 }
-Square.prototype.rotate = function()
+Square.prototype.rotate = function(num)
 {
-	this.dir = this.dir + 1 ; 
+	if(!num) num = 1;
+	this.dir = (this.dir + num)%4 ; 
 	if(this.dir == 4)
 	{
 		this.dir = 0 ; 
