@@ -1,3 +1,14 @@
+.square{
+	width: 400px;
+	height: 600px;
+	float: left;
+}
+
+.title{
+	font-size: 30px;
+	margin: 20px auto;
+}
+
 .game{
 	width:200px;
 	height: 400px;
@@ -5,9 +16,8 @@
 	border-left: 1px solid blue;
 	border-right: 1px solid blue;
 	border-bottom: 1px solid blue;
-	position: absolute;
-	top:10px;
-	left: 10px;
+	position: relative;
+	float: left;
 }
 
 .next
@@ -15,17 +25,17 @@
 	width: 80px ;
 	height: 80px;
 	background-color: #F2FAFF;
-	position: absolute;
-	top: 10px;
-	left: 250px;
-	border: 1px solid bule;
+	position: relative;
+	border: 1px solid blue;
+	float: left;
+	margin-left:20px;
 }
 
 .info
 {
-	position: absolute;
-	top: 100px;
-	left: 250px;
+	float: left;
+	margin-left:40px;
+	margin-top: 10px ;
 }
 
 .none, .current, .done{

@@ -53,6 +53,21 @@ var Local = function()
 		}
 	}
 
+	// 随机生成干扰行
+	var generateBottomLine = function(lineNum)
+	{
+		var lines = [];
+		for(var i = 0 ;i < lineNum; i++)
+		{
+			var line = [];
+			for(var j = 0 ; j < 10 ; j++)
+			{
+				line.push(Math.ceil(Math.random()*2)-1);
+			}
+			lines.push(line);
+		}
+		return lines ;
+	}
 	// timeCount 
 	var timeFunc = function()
 	{
@@ -62,6 +77,9 @@ var Local = function()
 			timeCount = 0 ;
 			time = time + 1 ;
 			game.setTime(time);
+			//  每隔10秒生成从底部生成干扰项
+			if(time % 10 == 0)
+				game.addTailLines(generateBottomLine(1));
 		}
 	}
 	// rand for 0 - 6
@@ -77,11 +95,11 @@ var Local = function()
 	var start = function(){
 		var dom = 
 		{
-			gameDiv:document.getElementById("game"),
-			nextDiv:document.getElementById("next"),
-			timeDiv:document.getElementById("time"),
-			scoreDiv:document.getElementById("score"),
-			resultDiv:document.getElementById("gameover")
+			gameDiv:document.getElementById("local_game"),
+			nextDiv:document.getElementById("local_next"),
+			timeDiv:document.getElementById("local_time"),
+			scoreDiv:document.getElementById("local_score"),
+			resultDiv:document.getElementById("local_gameover")
 
 		}	
 		game = new Game();
