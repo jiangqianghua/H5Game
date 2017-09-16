@@ -1,4 +1,4 @@
-var Local = function()
+var Local = function(socket)
 {
 	var game ; 
 	var INERVAL = 200 ;
@@ -13,20 +13,25 @@ var Local = function()
 			if(e.keyCode == 38)  // up
 			{
 				game.rotate();
+				socket.emit("rotate");
 			} else if(e.keyCode == 39) // right
 			{
 				game.right();
+				socket.emit("right");
 			} else if(e.keyCode == 40) // down
 			{
 				game.down();
+				socket.emit("down");
 			} 
 			else if(e.keyCode == 37)  // left 
 			{
 				game.left();
+				socket.emit("left");
 			} 
 			else if(e.keyCode == 32)  // space
 			{
 				game.fall();
+				socket.emit("fall");
 			} 
 		}
 	}
@@ -36,20 +41,38 @@ var Local = function()
 		if(!game.down())
 		{
 			game.fixed();
+			socket.emit("fixed");
 			var line = game.checkClear();
 			if(line)
 			{
 				game.addSocre(line);
+				socket.emit('line',line);
+
+				// 给对方增加干扰
+				if(line > 1)
+				{
+					var bottomLines = generateBottomLine(line);
+					socket.emit('bottomLines',bottomLines);
+				}
 			}
 			if(game.checkGameOver())
 			{
 				game.gameOver(false);
+				socket.emit("lose");
+				document.getElementById("remote_gameover").innerHTML="other win";
 				stop()
 			}
 			else
 			{
-				game.preformNext(generateType(),generateDir());
+				var t = generateType();
+				var d = generateDir() ;
+				game.preformNext(t,d);
+				socket.emit("next",{type:t,dir:d});
 			}
+		}
+		else
+		{
+			socket.emit("down");
 		}
 	}
 
@@ -77,9 +100,10 @@ var Local = function()
 			timeCount = 0 ;
 			time = time + 1 ;
 			game.setTime(time);
-			//  每隔10秒生成从底部生成干扰项
-			if(time % 10 == 0)
-				game.addTailLines(generateBottomLine(1));
+			//  每隔10秒生成从底部生成干扰项,测试使用
+			//if(time % 10 == 0)
+			//	game.addTailLines(generateBottomLine(1));
+			socket.emit('time',time);
 		}
 	}
 	// rand for 0 - 6
@@ -103,9 +127,16 @@ var Local = function()
 
 		}	
 		game = new Game();
-		game.init(dom,generateType(),generateDir());
+		var type = generateType() ; 
+		var dir = generateType() ;
+		game.init(dom,type,dir);
+		socket.emit('init',{type:type , dir:dir});
 		bindKeyEvent();
-		game.preformNext(generateType(),generateDir());
+		
+		var type1 = generateType() ; 
+		var dir1 = generateType() ;
+		game.preformNext(type1,dir1);
+		socket.emit('next',{type:type1 , dir:dir1});
 		timer = setInterval(move,INERVAL);
 
 	}
@@ -119,5 +150,26 @@ var Local = function()
 		}
 	}
 	// report fun
-	this.start = start ;
+	//this.start = start ;
+	socket.on("start",function(){
+		document.getElementById("waiting").innerHTML = "";
+		start();
+	});
+
+	// other emit you lose ,for you win game
+	socket.on("lose",function(){
+		game.gameOver(true);
+		start();
+	});
+
+	socket.on("leave",function(){
+		document.getElementById("local_gameover").innerHTML = "other leave";
+		document.getElementById("remote_gameover").innerHTML = "leaved";
+		stop();
+	});
+
+	socket.on("bottomLines",function(data){
+		game.addTailLines(data);
+		socket.emit("addTailLines",data);
+	});
 }

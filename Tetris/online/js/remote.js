@@ -1,47 +1,60 @@
-var Remote = function()
+var Remote = function(socket)
 {
 	var game ;
 	var bindKeyEvents = function()
 		{
-			document.getElementById("down").onclick = function(){
-				game.down();
-			}
-			document.getElementById("right").onclick = function(){
-				game.right();
-			}
-			document.getElementById("left").onclick = function(){
-				game.left();
-			}
-			document.getElementById("rotate").onclick = function(){
-				game.rotate();
-			}
-			document.getElementById("fall").onclick = function(){
-				game.fall();
-			}
-			document.getElementById("fixed").onclick = function(){
-				game.fixed();
-			}
-			document.getElementById("preformNext").onclick = function(){
-				game.preformNext(2,2);
-			}
-			document.getElementById("checkClear").onclick = function(){
-				game.checkClear();
-			}
-			document.getElementById("checkGameOver").onclick = function(){
-				game.checkGameOver();
-			}
-			document.getElementById("setTime").onclick = function(){
-				game.setTime(20);
-			}
-			document.getElementById("addSocre").onclick = function(){
-				game.addSocre(10);
-			}
-			document.getElementById("gameOver").onclick = function(){
-				game.gameOver(true);
-			}
-			document.getElementById("addTailLines").onclick = function(){
-				game.addTailLines([[1,0,1,0,1,1,1,0,0,1]]);
-			}
+			socket.on("init",function(data)
+				{
+					start(data.type,data.dir);
+				});
+
+			socket.on("next",function(data)
+				{
+					game.preformNext(data.type,data.dir);
+				});
+			socket.on("rotate",function(data)
+				{
+					game.rotate();
+				});
+			socket.on("right",function(data)
+				{
+					game.right();
+				});
+			socket.on("down",function(data)
+				{
+					game.down();
+				});
+			socket.on("left",function(data)
+				{
+					game.left();
+				});
+			socket.on("fall",function(data)
+				{
+					game.fall();
+				});
+			socket.on("fixed",function(data)
+				{
+					game.fixed();
+				});
+			socket.on("line",function(data)
+				{
+					game.checkClear();
+					game.addSocre(data);
+				});
+			socket.on("time",function(data)
+				{
+					game.setTime(data);
+				});
+
+			socket.on("lose",function(data)
+				{
+					game.gameOver(false);
+				});
+
+			socket.on("addTailLines",function(data)
+				{
+					game.addTailLines(data);
+				});
 		}
 	var start = function(type,dir)
 	{
@@ -58,6 +71,5 @@ var Remote = function()
 		game.init(dom,type,dir);
 	}
 
-	this.start = start ;
-	this.bindKeyEvents = bindKeyEvents ;
+	bindKeyEvents();
 }
